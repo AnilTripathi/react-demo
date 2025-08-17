@@ -1,5 +1,5 @@
-import React from 'react'
-import type { Employee } from '../types/employeeType'   
+import type { Employee } from '../types/employeeType'
+import Button from './Button'
 
 type EmployeeCardProps = {
   employee: Employee,
@@ -17,8 +17,24 @@ const EmployeeCard = ({ employee, onEdit, onDelete }: EmployeeCardProps) => {
         <td className="text-center">{employee.city}</td>
         <td className="text-center">{employee.state}</td>
         <td className="text-center">{employee.zip}</td>
-        <td className="text-center"><button className="btn btn-primary" onClick={() => onEdit(employee)}><i className="fa-solid fa-pen-to-square me-2"></i>Edit</button></td>
-        <td className="text-center"><button className="btn btn-danger" onClick={() => onDelete(employee.id)}><i className="fa-solid fa-trash me-2"></i>Delete</button></td>
+        <td className="text-center">
+            <Button
+                variant="primary"
+                onClick={() => onEdit(employee)}
+                icon="fa-solid fa-pen-to-square"
+            >
+                Edit
+            </Button>
+        </td>
+        <td className="text-center">
+            <Button
+                variant="danger"
+                onClick={() => onDelete(employee.id)}
+                icon="fa-solid fa-trash"
+            >
+                Delete
+            </Button>
+        </td>
     </tr>
   )
 }

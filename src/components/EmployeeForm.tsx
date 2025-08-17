@@ -1,5 +1,8 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import type { Employee } from '../types/employeeType';
+import { useForm } from 'react-hook-form';
+import FormInput from './FormInput';
+import Button from './Button';
 
 type EmployeeFormProps = {
   onSubmit: (employee: Employee) => void;
@@ -7,91 +10,132 @@ type EmployeeFormProps = {
 }
 
 const EmployeeForm = ({ onSubmit, employeeObject }: EmployeeFormProps) => {
-  const [employee, setEmployee] = useState<Employee>({
-    id: '',
-    name: '',
-    email: '',
-    phone: '',
-    address: '',
-    city: '',
-    state: '',
-    zip: '',
-  })
+  const { register, handleSubmit, formState: { errors }, reset, setValue } = useForm<Employee>();
 
   useEffect(() => {
-    if(employeeObject){
-        setEmployee(employeeObject);
+    if (employeeObject) {
+      Object.keys(employeeObject).forEach((key) => {
+        setValue(key as keyof Employee, employeeObject[key as keyof Employee]);
+      });
     }
-  }, [employeeObject]);
+  }, [employeeObject, setValue]);
 
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setEmployee({ ...employee, [name]: value } as Employee);
-  }
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    //check if employee object is blank then show error message
-    if (employee?.name === '' || employee?.email === '' || employee?.phone === '' || employee?.address === '' || employee?.city === '' || employee?.state === '' || employee?.zip === '') {
-        alert('Please fill in all fields');
-        return;
+  const onSubmitForm = (data: Employee) => {
+    if (!data.id) {
+      data.id = new Date().getTime().toString();
     }
-    if(employee?.id === ''){
-        employee.id = new Date().getTime().toString();
-    }
-    onSubmit(employee as Employee);
-    setEmployee({
-        id: '',
-        name: '',
-        email: '',
-        phone: '',
-        address: '',
-        city: '',
-        state: '',
-        zip: '',
-    })
+    onSubmit(data);
+    reset({
+      id: '',
+      name: '',
+      email: '',
+      phone: '',
+      address: '',
+      city: '',
+      state: '',
+      zip: '',
+    });
   }
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit(onSubmitForm)}>
         <div className="row">
-            <div className="col-md-6 mb-3">
-                <label htmlFor="name" className="form-label">Name</label>
-                <input className="form-control" type="text" name="name" value={employee?.name} onChange={handleChange} />
-            </div>
-            <div className="col-md-6 mb-3">
-                <label htmlFor="email" className="form-label">Email</label>
-                <input className="form-control" type="email" name="email" value={employee?.email} onChange={handleChange} />
-            </div>
+            <FormInput
+                label="Name"
+                name="name"
+                register={register}
+                error={errors.name}
+                validation={{
+                    required: 'Name is required',
+                    minLength: { value: 2, message: 'Name must be at least 2 characters' }
+                }}
+            />
+            <FormInput
+                label="Email"
+                name="email"
+                type="email"
+                register={register}
+                error={errors.email}
+                validation={{
+                    required: 'Email is required',
+                    pattern: {
+                        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                        message: 'Invalid email address'
+                    }
+                }}
+            />
         </div>
         <div className="row">
-            <div className="col-md-6 mb-3">
-                <label htmlFor="phone" className="form-label">Phone</label>
-                <input className="form-control" type="text" name="phone" value={employee?.phone} onChange={handleChange} />
-            </div>
-            <div className="col-md-6 mb-3">
-                <label htmlFor="address" className="form-label">Address</label>
-                <input className="form-control" type="text" name="address" value={employee?.address} onChange={handleChange} />
-            </div>
+            <FormInput
+                label="Phone"
+                name="phone"
+                register={register}
+                error={errors.phone}
+                validation={{
+                    required: 'Phone number is required',
+                    pattern: {
+                        value: /^\d{10}$/,
+                        message: 'Phone number must be 10 digits'
+                    }
+                }}
+            />
+            <FormInput
+                label="Address"
+                name="address"
+                register={register}
+                error={errors.address}
+                validation={{
+                    required: 'Address is required',
+                    minLength: { value: 5, message: 'Address must be at least 5 characters' }
+                }}
+            />
         </div>
         <div className="row">
-            <div className="col-md-4 mb-3">
-                <label htmlFor="city" className="form-label">City</label>
-                <input className="form-control" type="text" name="city" value={employee?.city} onChange={handleChange} />
-            </div>
-            <div className="col-md-4 mb-3">
-                <label htmlFor="state" className="form-label">State</label>
-                <input className="form-control" type="text" name="state" value={employee?.state} onChange={handleChange} />
-            </div>
-            <div className="col-md-4 mb-3">
-                <label htmlFor="zip" className="form-label">Zip</label>
-                <input className="form-control" type="text" name="zip" value={employee?.zip} onChange={handleChange} />
-            </div>
+            <FormInput
+                label="City"
+                name="city"
+                register={register}
+                error={errors.city}
+                validation={{
+                    required: 'City is required'
+                }}
+                className="col-md-4 mb-3"
+            />
+            <FormInput
+                label="State"
+                name="state"
+                register={register}
+                error={errors.state}
+                validation={{
+                    required: 'State is required'
+                }}
+                className="col-md-4 mb-3"
+            />
+            <FormInput
+                label="ZIP"
+                name="zip"
+                register={register}
+                error={errors.zip}
+                validation={{
+                    required: 'ZIP code is required',
+                    pattern: {
+                        value: /^\d{5}(-\d{4})?$/,
+                        message: 'Invalid ZIP code format'
+                    }
+                }}
+                className="col-md-4 mb-3"
+            />
         </div>
         <div className="row">
             <div className="col-md-12 mb-3 text-center d-grid gap-2">
-                <button type="submit" className="btn btn-primary"><i className="fa-solid fa-floppy-disk me-2"></i> Save</button>
+                <Button
+                    type="submit"
+                    variant="primary"
+                    icon="fa-solid fa-floppy-disk"
+                    fullWidth
+                >
+                    Save
+                </Button>
             </div>
         </div>
     </form>
