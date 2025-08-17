@@ -119,8 +119,8 @@ const EmployeeForm = ({ onSubmit, employeeObject }: EmployeeFormProps) => {
                 validation={{
                     required: 'ZIP code is required',
                     pattern: {
-                        value: /^\d{5}(-\d{4})?$/,
-                        message: 'Invalid ZIP code format'
+                        value: /^\d{5,6}(-\d{4})?$/,
+                        message: 'Please enter a valid ZIP code. Examples: 500084 (India), 12345 (US), or 12345-6789 (US ZIP+4)'
                     }
                 }}
                 className="col-md-4 mb-3"
